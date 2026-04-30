@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice · Reddit AI</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-brand">
+            <div class="header-logo">🎙</div>
+            <h1>Voice · Reddit AI</h1>
+        </div>
+        <span class="header-pill">realtime mode</span>
+    </header>
+
+    <div class="layout">
+        <div class="card">
+            <h2>Create a Post</h2>
+            <p class="sub">Speak your idea and generate a modern Reddit post with title, body, and visual.</p>
+
+            <div class="record-section">
+                <div class="record-ring">
+                    <svg class="record-ring-svg" viewBox="0 0 148 148" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#6366f1"/>
+                                <stop offset="100%" stop-color="#a78bfa"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="record-ring-track" cx="74" cy="74" r="65"></circle>
+                        <circle class="record-ring-arc" cx="74" cy="74" r="65" id="ringArc"></circle>
+                    </svg>
+                    <button id="recordBtn" type="button" class="record-button">
+                        <span id="btnIcon">⏺</span>
+                    </button>
+                </div>
+
+                <div class="record-label">
+                    <span class="record-label-text" id="btnText">Start Recording</span>
+                    <span id="timer" class="timer" style="display:none;">0:00</span>
+                </div>
+
+                <div id="recordingIndicator" class="recording-indicator">
+                    <div class="waveform">
+                        <div class="waveform-bar"></div>
+                        <div class="waveform-bar"></div>
+                        <div class="waveform-bar"></div>
+                        <div class="waveform-bar"></div>
+                        <div class="waveform-bar"></div>
+                    </div>
+                    <p>Live signal</p>
+                </div>
+
+                <div id="liveCaptionWrap" class="live-caption-wrap" hidden>
+                    <div class="live-caption-label">Live transcript</div>
+                    <div id="liveCaptionText" class="live-caption-text"></div>
+                    <div id="liveCaptionHint" class="live-caption-hint"></div>
+                </div>
+
+                <div id="statusBox" class="status-box">
+                    <div class="status-label" id="statusLabel">Status</div>
+                    <div id="statusText"></div>
+                    <div class="status-hint" id="statusHint"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card processing-card" id="processingCard">
+            <div class="progress-stages">
+                <div class="stage active" id="stage1">
+                    <div class="stage-icon">🎙</div>
+                    <div class="stage-label">Transcribe</div>
+                </div>
+                <div class="stage-arrow">›</div>
+                <div class="stage" id="stage2">
+                    <div class="stage-icon">🧠</div>
+                    <div class="stage-label">Generate</div>
+                </div>
+                <div class="stage-arrow">›</div>
+                <div class="stage" id="stage3">
+                    <div class="stage-icon">🎨</div>
+                    <div class="stage-label">Image</div>
+                </div>
+            </div>
+            <div id="transcriptSection" class="transcript-section" style="display:none;">
+                <div class="transcript-label">Heard</div>
+                <div class="transcript-text" id="transcriptText"></div>
+            </div>
+        </div>
+
+        <div class="card post-card" id="postCard">
+            <div class="post-meta">
+                <span class="post-meta-badge">r/general</span>
+                <span class="post-meta-dot"></span>
+                <span class="post-meta-user">u/VoiceAI_Bot</span>
+                <span class="post-meta-dot"></span>
+                <span class="post-meta-time">just now</span>
+            </div>
+            <div class="post-title" id="postTitle"></div>
+            <div class="post-body" id="postBody"></div>
+            <img class="post-image" id="postImage" src="" alt="Generated image">
+            <div class="post-actions">
+                <button class="action-btn upvote">▲ Upvote</button>
+                <button class="action-btn downvote">▼ Downvote</button>
+                <button class="action-btn">💬 Comment</button>
+                <button class="action-btn">⎘ Share</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+python-multipart
+transformers
+diffusers
+accelerate
+bitsandbytes
+openai-whisper
+sentencepiece
+scipy
+soundfile
+torch
+imageio-ffmpeg
