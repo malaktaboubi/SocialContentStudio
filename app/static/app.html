@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio · Pattern Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/shell.css">
+</head>
+<body>
+    <header class="shell-header">
+        <a class="shell-brand" href="/">
+            <span class="shell-brand-mark">SC</span>
+            <span class="shell-brand-text">
+                <span class="shell-brand-name">Social Content Studio</span>
+                <span class="shell-brand-group">Pattern Analytics</span>
+            </span>
+        </a>
+        <nav class="shell-header-nav">
+            <a class="shell-header-link" href="/">Landing</a>
+            <a class="shell-header-link" href="https://github.com" target="_blank" rel="noopener">Docs</a>
+        </nav>
+    </header>
+
+    <div class="shell-layout">
+        <aside class="shell-sidebar" aria-label="Platforms">
+            <div class="shell-sidebar-label">Platforms</div>
+            <ul id="shellTabs" class="shell-tabs"></ul>
+            <div class="shell-sidebar-foot">
+                <span class="shell-sidebar-hint">Pattern Analytics — one module per platform tab.</span>
+            </div>
+        </aside>
+
+        <main class="shell-main">
+            <div id="shellPanelHeader" class="shell-panel-header" hidden>
+                <div class="shell-panel-icon" id="shellPanelIcon"></div>
+                <div class="shell-panel-titles">
+                    <h1 id="shellPanelLabel"></h1>
+                    <p id="shellPanelTagline"></p>
+                </div>
+                <div class="shell-panel-meta">
+                    <span class="shell-panel-owner" id="shellPanelOwner"></span>
+                </div>
+            </div>
+
+            <section id="shellPanelMount" class="shell-panel-mount" data-platform=""></section>
+
+            <div id="shellEmpty" class="shell-empty">
+                <div class="shell-empty-icon">…</div>
+                <p>Loading platforms…</p>
+            </div>
+
+            <div id="shellToast" class="shell-toast" hidden></div>
+        </main>
+    </div>
+
+    <script src="/static/shell.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+/* Dashboard shell styles. Owns the chrome around each platform panel. */
+
+:root {
+    --bg: #09090f;
+    --surface: #0f0f1a;
+    --surface-2: #14142a;
+    --panel: rgba(255, 255, 255, 0.03);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-glow: rgba(99, 102, 241, 0.48);
+    --ink: #e8e8f0;
+    --ink-dim: #9fa3c7;
+    --ink-muted: #595f7f;
+    --accent: #6366f1;
+    --accent-2: #a78bfa;
+    --danger: #f87171;
+    --success: #34d399;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+    font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99,102,241,0.14) 0%, transparent 70%),
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+}
+
+/* Header */
+
+.shell-header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    height: 60px;
+    background: rgba(9, 9, 15, 0.86);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+}
+
+.shell-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--ink);
+}
+.shell-brand-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+.shell-brand-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    line-height: 1.15;
+}
+.shell-brand-name { font-size: 15px; font-weight: 700; }
+.shell-brand-group {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-2);
+}
+
+.shell-header-nav { display: flex; align-items: center; gap: 18px; }
+.shell-header-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-dim);
+    text-decoration: none;
+    transition: color 0.18s;
+}
+.shell-header-link:hover { color: var(--ink); }
+
+/* Layout */
+
+.shell-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: calc(100vh - 60px);
+}
+
+.shell-sidebar {
+    border-right: 1px solid var(--border);
+    background: rgba(15, 15, 26, 0.5);
+    padding: 24px 16px 32px;
+    display: flex;
+    flex-direction: column;
+}
+
+.shell-sidebar-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--ink-muted);
+    padding: 0 10px 12px;
+}
+
+.shell-tabs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.shell-tab {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: var(--ink-dim);
+    border: 1px solid transparent;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+.shell-tab:hover {
+    background: rgba(255,255,255,0.03);
+    color: var(--ink);
+}
+.shell-tab.active {
+    background: rgba(99,102,241,0.12);
+    border-color: rgba(99,102,241,0.4);
+    color: var(--ink);
+}
+.shell-tab-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.shell-tab.active .shell-tab-icon {
+    background: rgba(99,102,241,0.18);
+    border-color: rgba(99,102,241,0.45);
+}
+.shell-tab-label {
+    font-size: 14px;
+    font-weight: 500;
+    flex: 1;
+}
+.shell-tab-owner {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-muted);
+    letter-spacing: 0.4px;
+}
+
+.shell-sidebar-foot {
+    margin-top: 18px;
+    padding: 14px 10px 0;
+    border-top: 1px solid var(--border);
+}
+.shell-sidebar-hint {
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--ink-muted);
+}
+
+/* Main */
+
+.shell-main {
+    padding: 28px 32px 60px;
+    min-width: 0;
+}
+
+.shell-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+}
+.shell-panel-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.shell-panel-titles { flex: 1; min-width: 0; }
+.shell-panel-titles h1 {
+    margin: 0 0 4px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+}
+.shell-panel-titles p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ink-dim);
+}
+.shell-panel-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.shell-panel-owner {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(99,102,241,0.1);
+    color: var(--accent-2);
+    border: 1px solid rgba(99,102,241,0.28);
+}
+
+.shell-panel-mount {
+    width: 100%;
+}
+
+.shell-empty {
+    text-align: center;
+    color: var(--ink-muted);
+    padding: 80px 0;
+    font-size: 14px;
+}
+.shell-empty-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    color: var(--ink-dim);
+}
+
+/* Toast */
+.shell-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border-glow);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--ink);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.55);
+    font-size: 13px;
+    z-index: 50;
+    animation: shellToastIn 0.2s ease;
+}
+@keyframes shellToastIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile */
+@media (max-width: 840px) {
+    .shell-layout {
+        grid-template-columns: 1fr;
+    }
+    .shell-sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 14px;
+    }
+    .shell-tabs {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .shell-sidebar-label, .shell-sidebar-foot { display: none; }
+    .shell-main { padding: 18px; }
+}

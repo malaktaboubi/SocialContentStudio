@@ -1,0 +1,25 @@
+<div class="tw-panel">
+    <div class="tw-card">
+        <h2>Twitter / X post</h2>
+        <p class="tw-sub">Describe your idea, pick a tone, and get a short post you can paste into the timeline.</p>
+
+        <label class="tw-label" for="twTopic">What's it about?</label>
+        <textarea id="twTopic" class="tw-input" rows="5" placeholder="e.g. Shipped a new feature today — here's what we learned..."></textarea>
+
+        <label class="tw-label" for="twTone">Tone</label>
+        <select id="twTone" class="tw-input">
+            <option value="casual">Casual</option>
+            <option value="thread">Thread-style</option>
+            <option value="newsy">Newsy</option>
+        </select>
+
+        <button id="twGenerateBtn" class="tw-btn">Generate post</button>
+        <p id="twStatus" class="tw-status" aria-live="polite"></p>
+    </div>
+
+    <div id="twResultCard" class="tw-card" hidden>
+        <h2>Result</h2>
+        <div id="twPost" class="tw-output"></div>
+        <button id="twCopyBtn" class="tw-btn-secondary" style="margin-top:14px;">Copy</button>
+    </div>
+</div>

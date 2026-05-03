@@ -1,0 +1,26 @@
+<div class="li-panel">
+    <div class="li-card">
+        <h2>LinkedIn post</h2>
+        <p class="li-sub">Pick the angle (your role) and the topic. You'll get a structured post that lands like a real human wrote it.</p>
+
+        <label class="li-label" for="liTopic">Topic / lesson</label>
+        <textarea id="liTopic" class="li-input" rows="5" placeholder="e.g. Why our team switched from Jira to Linear..."></textarea>
+
+        <label class="li-label" for="liRole">Posting as</label>
+        <select id="liRole" class="li-input">
+            <option value="engineer">Engineer</option>
+            <option value="manager">Manager</option>
+            <option value="founder">Founder</option>
+            <option value="student">Student</option>
+        </select>
+
+        <button id="liGenerateBtn" class="li-btn">Write the post</button>
+        <p id="liStatus" class="li-status" aria-live="polite"></p>
+    </div>
+
+    <div id="liResultCard" class="li-card" hidden>
+        <h2>Result</h2>
+        <div id="liPost" class="li-output"></div>
+        <button id="liCopyBtn" class="li-btn-secondary" style="margin-top:14px;">Copy</button>
+    </div>
+</div>

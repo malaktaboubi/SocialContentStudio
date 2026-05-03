@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Content Studio · Pattern Analytics</title>
+    <meta name="description" content="Pattern Analytics — one idea, five platforms, zero copy-paste. AI-generated text and images for Reddit, Instagram, Twitter, LinkedIn and YouTube.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/landing.css">
+</head>
+<body>
+    <header class="ld-nav">
+        <a class="ld-brand" href="/">
+            <span class="ld-brand-mark">SC</span>
+            <span class="ld-brand-text">
+                <span class="ld-brand-name">Social Content Studio</span>
+                <span class="ld-brand-group">Pattern Analytics</span>
+            </span>
+        </a>
+        <nav class="ld-nav-links">
+            <a href="#features">Features</a>
+            <a href="#how">How it works</a>
+            <a href="#platforms">Platforms</a>
+        </nav>
+        <a class="ld-cta-primary" href="/app">Open Studio →</a>
+    </header>
+
+    <section class="ld-hero">
+        <div class="ld-hero-glow" aria-hidden="true"></div>
+        <div class="ld-hero-grid" aria-hidden="true"></div>
+
+        <div class="ld-hero-inner">
+            <span class="ld-hero-pill">Pattern Analytics</span>
+            <h1 class="ld-hero-title">
+                One idea.<br>
+                <span class="ld-hero-gradient">Five social posts.</span><br>
+                Zero copy-paste.
+            </h1>
+            <p class="ld-hero-sub">
+                Each platform has its own input, its own AI, and its own output —
+                as independent modules under Pattern Analytics. Pick a tab and ship.
+            </p>
+            <div class="ld-hero-cta">
+                <a class="ld-cta-primary ld-cta-lg" href="/app">Open Studio →</a>
+                <a class="ld-cta-ghost ld-cta-lg" href="#platforms">Browse platforms</a>
+            </div>
+
+            
+        </div>
+    </section>
+
+    <section id="features" class="ld-section">
+        <div class="ld-section-head">
+            <span class="ld-eyebrow">What you get</span>
+            <h2>Built for speed, not for shipping toy demos.</h2>
+        </div>
+        <div class="ld-features">
+            <article class="ld-feature">
+                <div class="ld-feature-icon">⌁</div>
+                <h3>Bring your own input</h3>
+                <p>Voice, text, photo, prompt — every platform takes the input that fits it best, no forced template.</p>
+            </article>
+            <article class="ld-feature">
+                <div class="ld-feature-icon">◇</div>
+                <h3>Text + visuals</h3>
+                <p>Generated copy plus AI imagery where the platform needs it. Edit anything before you publish.</p>
+            </article>
+            <article class="ld-feature">
+                <div class="ld-feature-icon">⊕</div>
+                <h3>Free APIs by default</h3>
+                <p>Whisper, OpenRouter, HuggingFace and Pollinations. No paid tier required to demo the project.</p>
+            </article>
+            <article class="ld-feature">
+                <div class="ld-feature-icon">⌧</div>
+                <h3>Modular by design</h3>
+                <p>Every platform is a self-contained plugin for Pattern Analytics. Drop a folder in, get a tab. No coupling between modules.</p>
+            </article>
+        </div>
+    </section>
+
+    <section id="how" class="ld-section ld-section-alt">
+        <div class="ld-section-head">
+            <span class="ld-eyebrow">How it works</span>
+            <h2>From idea to post in three steps.</h2>
+        </div>
+        <div class="ld-steps">
+            <article class="ld-step">
+                <div class="ld-step-num">01</div>
+                <h3>Pick a platform</h3>
+                <p>Open the Studio. The sidebar lists every platform module in the project.</p>
+            </article>
+            <article class="ld-step">
+                <div class="ld-step-num">02</div>
+                <h3>Give your input</h3>
+                <p>Speak, type, or upload — whatever the platform you opened needs.</p>
+            </article>
+            <article class="ld-step">
+                <div class="ld-step-num">03</div>
+                <h3>Edit and publish</h3>
+                <p>Tweak the generated copy, swap the image, copy to clipboard, and you're done.</p>
+            </article>
+        </div>
+    </section>
+
+    <section id="platforms" class="ld-section">
+        <div class="ld-section-head">
+            <span class="ld-eyebrow">Platforms</span>
+            <h2>Five modules. One studio.</h2>
+            <p class="ld-section-sub">Each card below is a self-contained platform module. They publish to <code>/api/&lt;platform&gt;/...</code> and own their UI end to end.</p>
+        </div>
+        <div id="ldPlatformsGrid" class="ld-platforms"></div>
+    </section>
+
+    <footer class="ld-footer">
+        <div class="ld-footer-inner">
+            <div>
+                <div class="ld-brand">
+                    <span class="ld-brand-mark">SC</span>
+                    <span class="ld-brand-text">
+                        <span class="ld-brand-name">Social Content Studio</span>
+                        <span class="ld-brand-group">Pattern Analytics</span>
+                    </span>
+                </div>
+            </div>
+            <div id="ldFooterCredits" class="ld-footer-credits"></div>
+            <a class="ld-cta-primary" href="/app">Open Studio →</a>
+        </div>
+    </footer>
+
+    <script src="/static/landing.js" defer></script>
+</body>
+</html>

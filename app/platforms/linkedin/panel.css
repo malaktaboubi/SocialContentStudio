@@ -1,0 +1,101 @@
+/* LinkedIn panel — scoped to .li-panel (Pattern Analytics). */
+
+.li-panel {
+    --li-accent: #0a66c2;
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.li-panel .li-card {
+    background: var(--surface, #0f0f1a);
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    border-radius: 18px;
+    padding: 24px;
+    color: var(--ink, #e8e8f0);
+}
+
+.li-panel h2 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--li-accent);
+    margin-bottom: 6px;
+}
+
+.li-panel .li-sub {
+    color: var(--ink-dim, #9fa3c7);
+    font-size: 14px;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+
+.li-panel .li-label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--ink-muted, #595f7f);
+    margin-bottom: 6px;
+}
+
+.li-panel .li-input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    background: var(--bg, #09090f);
+    color: var(--ink, #e8e8f0);
+    font-family: inherit;
+    font-size: 15px;
+    margin-bottom: 14px;
+    line-height: 1.5;
+}
+.li-panel .li-input:focus {
+    outline: none;
+    border-color: var(--li-accent);
+    box-shadow: 0 0 0 2px rgba(10,102,194,0.18);
+}
+
+.li-panel .li-btn,
+.li-panel .li-btn-secondary {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 11px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+}
+.li-panel .li-btn {
+    background: var(--li-accent);
+    color: #fff;
+}
+.li-panel .li-btn:hover { filter: brightness(1.08); }
+.li-panel .li-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.li-panel .li-btn-secondary {
+    background: rgba(10,102,194,0.12);
+    color: var(--li-accent);
+    border: 1px solid rgba(10,102,194,0.4);
+}
+.li-panel .li-btn-secondary:hover { background: rgba(10,102,194,0.2); }
+
+.li-panel .li-status {
+    font-size: 13px;
+    color: var(--ink-muted, #595f7f);
+    min-height: 1.2em;
+    margin-top: 10px;
+}
+
+.li-panel .li-output {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    background: var(--bg, #09090f);
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    border-radius: 10px;
+    padding: 16px;
+    color: var(--ink, #e8e8f0);
+}

@@ -1,0 +1,147 @@
+<div class="reddit-panel">
+    <div class="card">
+        <h2>Create a Post</h2>
+        <p class="sub">Speak your idea and generate a modern Reddit post with title, body, and visual.</p>
+
+        <div class="tone-row">
+            <label for="toneSelect" class="tone-label">Tone / style</label>
+            <select id="toneSelect" class="tone-select" aria-describedby="toneHint"></select>
+            <p id="toneHint" class="tone-hint">Applied to generation and "Regenerate text". Change it before regenerating for a different voice.</p>
+        </div>
+
+        <div class="record-section">
+            <div class="record-ring">
+                <svg class="record-ring-svg" viewBox="0 0 148 148" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#6366f1"/>
+                            <stop offset="100%" stop-color="#a78bfa"/>
+                        </linearGradient>
+                    </defs>
+                    <circle class="record-ring-track" cx="74" cy="74" r="65"></circle>
+                    <circle class="record-ring-arc" cx="74" cy="74" r="65" id="ringArc"></circle>
+                </svg>
+                <button id="recordBtn" type="button" class="record-button">
+                    <span id="btnIcon">⏺</span>
+                </button>
+            </div>
+
+            <div class="record-label">
+                <span class="record-label-text" id="btnText">Start Recording</span>
+                <span id="timer" class="timer" style="display:none;">0:00</span>
+            </div>
+
+            <div id="recordingIndicator" class="recording-indicator">
+                <div class="waveform">
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                </div>
+                <p>Live signal</p>
+            </div>
+
+            <div id="liveCaptionWrap" class="live-caption-wrap" hidden>
+                <div class="live-caption-label">Live transcript</div>
+                <div id="liveCaptionText" class="live-caption-text"></div>
+                <div id="liveCaptionHint" class="live-caption-hint"></div>
+            </div>
+
+            <div id="statusBox" class="status-box">
+                <div class="status-label" id="statusLabel">Status</div>
+                <div id="statusText"></div>
+                <div class="status-hint" id="statusHint"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card processing-card" id="processingCard">
+        <div class="processing-progress" role="status" aria-live="polite" aria-atomic="true">
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="progressBarFill" style="width: 0%"></div>
+            </div>
+            <div class="progress-bar-meta">
+                <span id="progressMessage" class="progress-message">Starting…</span>
+                <span id="progressPercent" class="progress-percent">0%</span>
+            </div>
+            <p id="progressDetail" class="progress-detail"></p>
+        </div>
+        <div class="progress-stages">
+            <div class="stage active" id="stage1">
+                <div class="stage-icon">🎙</div>
+                <div class="stage-label">Transcribe</div>
+            </div>
+            <div class="stage-arrow">›</div>
+            <div class="stage" id="stage2">
+                <div class="stage-icon">🧠</div>
+                <div class="stage-label">Generate</div>
+            </div>
+            <div class="stage-arrow">›</div>
+            <div class="stage" id="stage3">
+                <div class="stage-icon">🎨</div>
+                <div class="stage-label">Image</div>
+            </div>
+        </div>
+        <div id="transcriptSection" class="transcript-section" style="display:none;">
+            <div class="transcript-label">Heard</div>
+            <div class="transcript-text" id="transcriptText"></div>
+        </div>
+    </div>
+
+    <div class="card post-card" id="postCard">
+        <div id="postCardError" class="post-card-error" hidden></div>
+        <div id="postCardBody">
+            <div class="post-meta">
+                <span class="post-meta-badge">r/general</span>
+                <span class="post-meta-dot"></span>
+                <span class="post-meta-user">u/VoiceAI_Bot</span>
+                <span class="post-meta-dot"></span>
+                <span class="post-meta-time">just now</span>
+            </div>
+
+            <div class="post-editor-toolbar" role="group" aria-label="Copy to clipboard">
+                <span class="toolbar-label">Copy</span>
+                <button type="button" class="toolbar-btn" id="copyTitleBtn">Title</button>
+                <button type="button" class="toolbar-btn" id="copyBodyBtn">Body</button>
+                <button type="button" class="toolbar-btn" id="copyMdBtn">All (Markdown)</button>
+            </div>
+
+            <label class="field-label" for="editTitle">Title</label>
+            <input type="text" class="post-field post-field-title" id="editTitle" maxlength="300" autocomplete="off">
+
+            <label class="field-label" for="editBody">Body</label>
+            <textarea class="post-field post-field-body" id="editBody" rows="10"></textarea>
+
+            <details class="image-prompt-details">
+                <summary>Image prompt <span class="summary-hint">edit before regenerating image</span></summary>
+                <textarea class="post-field post-field-prompt" id="editImagePrompt" rows="4"></textarea>
+            </details>
+
+            <div class="regenerate-row">
+                <button type="button" class="btn-secondary" id="regenTextBtn">↻ Regenerate text</button>
+                <button type="button" class="btn-secondary" id="regenImageBtn">↻ Regenerate image</button>
+            </div>
+            <p id="regenStatus" class="regen-status" aria-live="polite"></p>
+
+            <div class="post-image-wrap">
+                <button type="button" class="btn-secondary btn-download-img" id="downloadImageBtn" disabled>⬇ Download PNG</button>
+                <img class="post-image" id="postImage" src="" alt="Generated image">
+            </div>
+
+            <div class="post-actions">
+                <button type="button" class="action-btn upvote">▲ Upvote</button>
+                <button type="button" class="action-btn downvote">▼ Downvote</button>
+                <button type="button" class="action-btn">💬 Comment</button>
+                <button type="button" class="action-btn">⎘ Share</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card history-card" id="historyCard">
+        <h2>Recent runs</h2>
+        <p class="sub">Stored in this browser only (localStorage). Restore a run after refresh or pick up where you left off.</p>
+        <p id="historyEmpty" class="history-empty">No saved runs yet — finish a recording to see it here.</p>
+        <ul id="historyList" class="history-list" aria-label="Saved runs"></ul>
+    </div>
+</div>

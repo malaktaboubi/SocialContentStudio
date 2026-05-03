@@ -1,39 +1,94 @@
-from pathlib import Path
-from typing import Annotated
+"""Shell routes — pure plumbing, no business logic.
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+This file only:
+- serves the SaaS landing page at `/`
+- serves the dashboard shell at `/app`
+- exposes the platform registry as JSON at `/api/platforms`
+- serves each platform's panel.html / panel.js / panel.css
+  files from their `app/platforms/<id>/` folder
+
+Each platform's HTTP business endpoints are mounted at /api/<id>/...
+by the aggregate router built in `app.platforms.registry`.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
-from ..core.config import OUTPUT_DIR, STATIC_DIR
-from ..services.content_service import process_audio_bytes
+from ..core.config import PLATFORMS_DIR, STATIC_DIR
+from ..platforms.registry import all_platforms_dict
 
 router = APIRouter()
 
+_PANEL_FILES = {
+    "html": ("panel.html", "text/html"),
+    "js": ("panel.js", "application/javascript"),
+    "css": ("panel.css", "text/css"),
+}
+
 
 @router.get("/")
-async def get_index() -> FileResponse:
-    return FileResponse(STATIC_DIR / "index.html")
+async def get_landing() -> FileResponse:
+    return FileResponse(STATIC_DIR / "landing.html")
 
 
-@router.post("/process")
-async def process_audio(file: Annotated[UploadFile, File(...)]) -> dict[str, str]:
-    if not file.filename:
-        raise HTTPException(status_code=400, detail="Missing uploaded filename.")
+@router.get("/app")
+async def get_dashboard() -> FileResponse:
+    return FileResponse(STATIC_DIR / "app.html")
 
-    raw_bytes = await file.read()
-    if not raw_bytes:
-        raise HTTPException(status_code=400, detail="Uploaded audio file is empty.")
+
+@router.get("/api/platforms")
+async def list_platforms() -> dict:
+    items = []
+    for meta in all_platforms_dict():
+        pid = meta["id"]
+        items.append(
+            {
+                **meta,
+                "panel_html_url": f"/platforms/{pid}/panel.html",
+                "panel_js_url": f"/platforms/{pid}/panel.js",
+                "panel_css_url": f"/platforms/{pid}/panel.css",
+                "api_prefix": f"/api/{pid}",
+            }
+        )
+    return {"platforms": items}
+
+
+def _safe_panel_path(platform_id: str, kind: str) -> Path:
+    if kind not in _PANEL_FILES:
+        raise HTTPException(status_code=404, detail="Unknown panel asset.")
+    if not platform_id.isidentifier():
+        raise HTTPException(status_code=400, detail="Invalid platform id.")
+
+    filename, _ = _PANEL_FILES[kind]
+    candidate = (PLATFORMS_DIR / platform_id / filename).resolve()
 
     try:
-        return process_audio_bytes(file.filename, raw_bytes)
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
+        candidate.relative_to(PLATFORMS_DIR.resolve())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="Path traversal blocked.") from exc
+
+    if not candidate.exists() or not candidate.is_file():
+        raise HTTPException(status_code=404, detail=f"{filename} not found for {platform_id}.")
+    return candidate
 
 
-@router.get("/images/{filename}")
-async def get_image(filename: str) -> FileResponse:
-    image_path = OUTPUT_DIR / filename
-    if not image_path.exists() or not image_path.is_file():
-        raise HTTPException(status_code=404, detail="Image not found.")
+@router.get("/platforms/{platform_id}/panel.html")
+async def get_panel_html(platform_id: str) -> FileResponse:
+    path = _safe_panel_path(platform_id, "html")
+    return FileResponse(path, media_type="text/html")
 
-    return FileResponse(path=image_path)
+
+@router.get("/platforms/{platform_id}/panel.js")
+async def get_panel_js(platform_id: str) -> FileResponse:
+    path = _safe_panel_path(platform_id, "js")
+    return FileResponse(path, media_type="application/javascript")
+
+
+@router.get("/platforms/{platform_id}/panel.css")
+async def get_panel_css(platform_id: str) -> FileResponse:
+    path = _safe_panel_path(platform_id, "css")
+    return FileResponse(path, media_type="text/css")

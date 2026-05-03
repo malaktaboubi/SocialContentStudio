@@ -1,0 +1,38 @@
+<div class="yt-panel">
+    <div class="yt-card">
+        <h2>YouTube video metadata</h2>
+        <p class="yt-sub">Tell the model what your video is about and what kind of video it is. You'll get a title, description, tags, and a thumbnail prompt.</p>
+
+        <label class="yt-label" for="ytSubject">Video subject</label>
+        <textarea id="ytSubject" class="yt-input" rows="4" placeholder="e.g. How I built a SaaS in a weekend with FastAPI..."></textarea>
+
+        <label class="yt-label" for="ytKind">Kind</label>
+        <select id="ytKind" class="yt-input">
+            <option value="tutorial">Tutorial</option>
+            <option value="vlog">Vlog</option>
+            <option value="review">Review</option>
+            <option value="shorts">Shorts</option>
+        </select>
+
+        <button id="ytGenerateBtn" class="yt-btn">Generate</button>
+        <p id="ytStatus" class="yt-status" aria-live="polite"></p>
+    </div>
+
+    <div id="ytResultCard" class="yt-card" hidden>
+        <h2>Result</h2>
+
+        <label class="yt-label">Title</label>
+        <div id="ytTitle" class="yt-output yt-title"></div>
+
+        <label class="yt-label" style="margin-top:14px;">Description</label>
+        <div id="ytDescription" class="yt-output"></div>
+
+        <label class="yt-label" style="margin-top:14px;">Thumbnail prompt</label>
+        <div id="ytThumb" class="yt-output yt-thumb"></div>
+
+        <label class="yt-label" style="margin-top:14px;">Tags</label>
+        <div id="ytTags" class="yt-output yt-tags"></div>
+
+        <button id="ytCopyBtn" class="yt-btn-secondary" style="margin-top:14px;">Copy all</button>
+    </div>
+</div>

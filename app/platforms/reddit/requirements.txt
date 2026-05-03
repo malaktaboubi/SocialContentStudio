@@ -1,0 +1,12 @@
+openai-whisper
+torch
+transformers
+diffusers
+accelerate
+bitsandbytes
+sentencepiece
+scipy
+soundfile
+imageio-ffmpeg
+huggingface_hub
+pydantic

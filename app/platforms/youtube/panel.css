@@ -1,0 +1,104 @@
+/* YouTube panel — scoped to .yt-panel (Pattern Analytics). */
+
+.yt-panel {
+    --yt-accent: #ff0000;
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.yt-panel .yt-card {
+    background: var(--surface, #0f0f1a);
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    border-radius: 18px;
+    padding: 24px;
+    color: var(--ink, #e8e8f0);
+}
+
+.yt-panel h2 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--yt-accent);
+    margin-bottom: 6px;
+}
+
+.yt-panel .yt-sub {
+    color: var(--ink-dim, #9fa3c7);
+    font-size: 14px;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+
+.yt-panel .yt-label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--ink-muted, #595f7f);
+    margin-bottom: 6px;
+}
+
+.yt-panel .yt-input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    background: var(--bg, #09090f);
+    color: var(--ink, #e8e8f0);
+    font-family: inherit;
+    font-size: 15px;
+    margin-bottom: 14px;
+    line-height: 1.5;
+}
+.yt-panel .yt-input:focus {
+    outline: none;
+    border-color: var(--yt-accent);
+    box-shadow: 0 0 0 2px rgba(255,0,0,0.18);
+}
+
+.yt-panel .yt-btn,
+.yt-panel .yt-btn-secondary {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 11px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+}
+.yt-panel .yt-btn {
+    background: var(--yt-accent);
+    color: #fff;
+}
+.yt-panel .yt-btn:hover { filter: brightness(1.08); }
+.yt-panel .yt-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.yt-panel .yt-btn-secondary {
+    background: rgba(255,0,0,0.12);
+    color: var(--yt-accent);
+    border: 1px solid rgba(255,0,0,0.4);
+}
+.yt-panel .yt-btn-secondary:hover { background: rgba(255,0,0,0.2); }
+
+.yt-panel .yt-status {
+    font-size: 13px;
+    color: var(--ink-muted, #595f7f);
+    min-height: 1.2em;
+    margin-top: 10px;
+}
+
+.yt-panel .yt-output {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    background: var(--bg, #09090f);
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--ink, #e8e8f0);
+}
+.yt-panel .yt-title { font-size: 18px; font-weight: 700; line-height: 1.3; }
+.yt-panel .yt-thumb { font-family: ui-monospace, monospace; font-size: 13px; color: var(--ink-dim, #9fa3c7); }
+.yt-panel .yt-tags { color: var(--yt-accent); font-weight: 600; }

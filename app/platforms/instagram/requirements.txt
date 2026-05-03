@@ -1,0 +1,29 @@
+pydantic
+# 1. On définit l'index principal (standard) pour la majorité des bibs
+--index-url https://pypi.org/simple
+
+# 2. On ajoute l'index PyTorch comme source secondaire (extra)
+--extra-index-url https://download.pytorch.org/whl/cu118
+
+# --- Bibliothèques Standards ---
+fastapi
+uvicorn
+python-multipart
+groq
+nest_asyncio
+Pillow
+
+# --- IA & Modèles ---
+openai-whisper
+diffusers
+transformers
+accelerate
+
+# --- Torch & Vision (ils seront piochés dans l'extra-index CUDA) ---
+torch
+torchvision
+imageio-ffmpeg
+einops
+transformers
+accelerate
+timm

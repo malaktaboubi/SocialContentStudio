@@ -1,0 +1,226 @@
+<div class="instagram-panel">
+
+    <!-- ── Mode switcher ── -->
+    <div class="card mode-card">
+        <div class="card-accent"></div>
+        <h2>Create an Instagram Post</h2>
+        <p class="sub">Choose how you want to start — speak your idea or upload an image.</p>
+
+        <div class="mode-switcher" role="tablist" aria-label="Input mode">
+            <button type="button" class="mode-btn active" id="igModeVoiceBtn" role="tab" aria-selected="true" aria-controls="igVoicePanel">
+                <span class="mode-btn-icon">🎙</span>
+                <span class="mode-btn-label">Voice</span>
+                <span class="mode-btn-sub">Speak → caption + image</span>
+            </button>
+            <button type="button" class="mode-btn" id="igModeImageBtn" role="tab" aria-selected="false" aria-controls="igImagePanel">
+                <span class="mode-btn-icon">🖼</span>
+                <span class="mode-btn-label">Upload Image</span>
+                <span class="mode-btn-sub">Photo → caption + hashtags</span>
+            </button>
+        </div>
+
+        <div class="tone-row">
+            <label for="igToneSelect" class="tone-label">Tone / style</label>
+            <select id="igToneSelect" class="tone-select" aria-describedby="igToneHint"></select>
+            <p id="igToneHint" class="tone-hint">Applied to all generation. Change it before regenerating for a different voice.</p>
+        </div>
+    </div>
+
+    <!-- ── Voice panel ── -->
+    <div class="card" id="igVoicePanel" role="tabpanel">
+        <div class="card-accent"></div>
+
+        <div class="record-section">
+            <div class="record-ring">
+                <svg class="record-ring-svg" viewBox="0 0 148 148" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="igArcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#833ab4"/>
+                            <stop offset="50%" stop-color="#e1306c"/>
+                            <stop offset="100%" stop-color="#f77737"/>
+                        </linearGradient>
+                    </defs>
+                    <circle class="record-ring-track" cx="74" cy="74" r="65"></circle>
+                    <circle class="record-ring-arc" cx="74" cy="74" r="65" id="igRingArc"></circle>
+                </svg>
+                <button id="igRecordBtn" type="button" class="record-button">
+                    <span id="igBtnIcon">⏺</span>
+                </button>
+            </div>
+
+            <div class="record-label">
+                <span class="record-label-text" id="igBtnText">Start Recording</span>
+                <span id="igTimer" class="timer" style="display:none;">0:00</span>
+            </div>
+
+            <div id="igRecordingIndicator" class="recording-indicator">
+                <div class="waveform">
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                </div>
+                <p>Live signal</p>
+            </div>
+
+            <div id="igLiveCaptionWrap" class="live-caption-wrap" hidden>
+                <div class="live-caption-label">Live transcript</div>
+                <div id="igLiveCaptionText" class="live-caption-text"></div>
+                <div id="igLiveCaptionHint" class="live-caption-hint"></div>
+            </div>
+
+            <div id="igStatusBox" class="status-box">
+                <div class="status-label" id="igStatusLabel">Status</div>
+                <div id="igStatusText"></div>
+                <div class="status-hint" id="igStatusHint"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Image upload panel ── -->
+    <div class="card" id="igImagePanel" role="tabpanel" style="display:none;">
+        <div class="card-accent"></div>
+
+        <div class="upload-section">
+            <!-- Drop zone -->
+            <div class="upload-dropzone" id="igDropzone" tabindex="0" role="button" aria-label="Upload image">
+                <div class="upload-dropzone-inner" id="igDropzoneInner">
+                    <div class="upload-icon">🖼</div>
+                    <p class="upload-title">Drop your image here</p>
+                    <p class="upload-sub">or click to browse — JPG, PNG, WebP</p>
+                </div>
+                <img class="upload-preview" id="igUploadPreview" src="" alt="Preview" style="display:none;">
+            </div>
+            <input type="file" id="igFileInput" accept="image/jpeg,image/png,image/webp" style="display:none;" aria-hidden="true">
+
+            <div id="igUploadStatusBox" class="status-box" style="margin-top:14px;">
+                <div class="status-label" id="igUploadStatusLabel">Status</div>
+                <div id="igUploadStatusText"></div>
+                <div class="status-hint" id="igUploadStatusHint"></div>
+            </div>
+
+            <button type="button" class="btn-generate" id="igGenerateFromImageBtn" disabled>
+                ✨ Generate Caption from Image
+            </button>
+        </div>
+    </div>
+
+    <!-- ── Processing card (shared) ── -->
+    <div class="card processing-card" id="igProcessingCard">
+        <div class="card-accent"></div>
+        <div class="processing-progress" role="status" aria-live="polite" aria-atomic="true">
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="igProgressBarFill" style="width: 0%"></div>
+            </div>
+            <div class="progress-bar-meta">
+                <span id="igProgressMessage" class="progress-message">Starting…</span>
+                <span id="igProgressPercent" class="progress-percent">0%</span>
+            </div>
+            <p id="igProgressDetail" class="progress-detail"></p>
+        </div>
+        <div class="progress-stages" id="igVoiceStages">
+            <div class="stage active" id="igStage1">
+                <div class="stage-icon">🎙</div>
+                <div class="stage-label">Transcribe</div>
+            </div>
+            <div class="stage-arrow">›</div>
+            <div class="stage" id="igStage2">
+                <div class="stage-icon">✍️</div>
+                <div class="stage-label">Caption</div>
+            </div>
+            <div class="stage-arrow">›</div>
+            <div class="stage" id="igStage3">
+                <div class="stage-icon">🎨</div>
+                <div class="stage-label">Image</div>
+            </div>
+        </div>
+        <div class="progress-stages" id="igImageStages" style="display:none;">
+            <div class="stage active" id="igImgStage1">
+                <div class="stage-icon">🖼</div>
+                <div class="stage-label">Analyse</div>
+            </div>
+            <div class="stage-arrow">›</div>
+            <div class="stage" id="igImgStage2">
+                <div class="stage-icon">✍️</div>
+                <div class="stage-label">Caption</div>
+            </div>
+        </div>
+        <div id="igTranscriptSection" class="transcript-section" style="display:none;">
+            <div class="transcript-label">Heard</div>
+            <div class="transcript-text" id="igTranscriptText"></div>
+        </div>
+    </div>
+
+    <!-- ── Post card (shared) ── -->
+    <div class="card post-card" id="igPostCard">
+        <div class="card-accent"></div>
+        <div id="igPostCardError" class="post-card-error" hidden></div>
+        <div id="igPostCardBody">
+            <div class="post-meta">
+                <div class="post-avatar">
+                    <div class="post-avatar-inner">📸</div>
+                </div>
+                <div class="post-meta-info">
+                    <div class="post-meta-user">voice_ai_post</div>
+                    <div class="post-meta-location" id="igPostSource">Generated from voice</div>
+                </div>
+                <span class="post-meta-more">⋯</span>
+            </div>
+
+            <div class="post-editor-toolbar" role="group" aria-label="Copy to clipboard">
+                <span class="toolbar-label">Copy</span>
+                <button type="button" class="toolbar-btn" id="igCopyCaptionBtn">Caption</button>
+                <button type="button" class="toolbar-btn" id="igCopyHashtagsBtn">Hashtags</button>
+                <button type="button" class="toolbar-btn" id="igCopyAllBtn">Caption + Tags</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+    <label class="field-label" for="igEditCaption">Voice</label>
+    <button id="igSpeakBtn" class="toolbar-btn" style="border:none; background:none; cursor:pointer; font-size: 1.2rem;" title="Écouter la légende">🔊</button>
+</div>
+
+            <label class="field-label" for="igEditCaption">Caption</label>
+            <textarea class="post-field post-field-caption" id="igEditCaption" rows="6"></textarea>
+
+            <label class="field-label" for="igEditHashtags">Hashtags</label>
+            <textarea class="post-field post-field-hashtags" id="igEditHashtags" rows="3"></textarea>
+
+
+
+            <details class="image-prompt-details">
+                <summary>Image prompt <span class="summary-hint">edit before regenerating image</span></summary>
+                <textarea class="post-field post-field-prompt" id="igEditImagePrompt" rows="4"></textarea>
+            </details>
+
+            <div class="regenerate-row">
+                <button type="button" class="btn-secondary" id="igRegenTextBtn">↻ Regenerate caption</button>
+                <button type="button" class="btn-secondary" id="igRegenImageBtn">↻ Regenerate image</button>
+            </div>
+            <p id="igRegenStatus" class="regen-status" aria-live="polite"></p>
+
+            <div class="post-image-wrap">
+                <button type="button" class="btn-secondary btn-download-img" id="igDownloadImageBtn" disabled>⬇ Download PNG (1080×1080)</button>
+                <img class="post-image" id="igPostImage" src="" alt="Generated Instagram image">
+            </div>
+
+            <div class="post-actions">
+                <button type="button" class="action-btn like" title="Like">♡</button>
+                <button type="button" class="action-btn comment" title="Comment">💬</button>
+                <button type="button" class="action-btn share" title="Share">✈</button>
+                <div class="action-btn-spacer"></div>
+                <button type="button" class="action-btn save" title="Save">🔖</button>
+            </div>
+        </div>
+    </div>
+
+
+    
+    <!-- ── History card ── -->
+    <div class="card history-card" id="igHistoryCard">
+        <div class="card-accent"></div>
+        <h2>Recent runs</h2>
+        <p class="sub">Stored in this browser only (localStorage). Restore a run after refresh or pick up where you left off.</p>
+        <p id="igHistoryEmpty" class="history-empty">No saved runs yet — finish a recording to see it here.</p>
+        <ul id="igHistoryList" class="history-list" aria-label="Saved Instagram runs"></ul>
+    </div>
+</div>
