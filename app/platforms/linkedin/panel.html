@@ -1,26 +1,57 @@
 <div class="li-panel">
     <div class="li-card">
-        <h2>LinkedIn post</h2>
-        <p class="li-sub">Pick the angle (your role) and the topic. You'll get a structured post that lands like a real human wrote it.</p>
+        <h2 class="li-title-main">PostPilot AI</h2>
+        <p class="li-sub">Upload an image and let the AI generate three distinct caption styles for you.</p>
 
-        <label class="li-label" for="liTopic">Topic / lesson</label>
-        <textarea id="liTopic" class="li-input" rows="5" placeholder="e.g. Why our team switched from Jira to Linear..."></textarea>
+        <!-- Image Upload Logic[cite: 1, 4] -->
+        <div id="liDropZone" class="li-drop-zone">
+            <div class="li-drop-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+            </div>
+            <p class="li-drop-title">Drag & drop your photo</p>
+            <p class="li-drop-sub">or click to browse</p>
+        </div>
+        <input type="file" id="liFileInput" accept="image/*" style="display:none" />
 
-        <label class="li-label" for="liRole">Posting as</label>
-        <select id="liRole" class="li-input">
-            <option value="engineer">Engineer</option>
-            <option value="manager">Manager</option>
-            <option value="founder">Founder</option>
-            <option value="student">Student</option>
-        </select>
+        <!-- Preview & Scan Animation[cite: 1, 4] -->
+        <div id="liPreviewWrap" class="li-preview-wrap" hidden>
+            <img id="liPreviewImg" src="" alt="Preview" class="li-preview-img"/>
+            <div id="liScanOverlay" class="li-scan-overlay" hidden>
+                <div class="li-scan-line"></div>
+                <div class="li-scan-body">
+                    <p class="li-scan-label">Analyzing image context...</p>
+                    <div class="li-progress-track"><div id="liProgressFill" class="li-progress-fill"></div></div>
+                </div>
+            </div>
+            <button id="liClearImg" class="li-clear-btn" hidden>×</button>
+        </div>
+        <button id="liRemoveImg" class="li-btn li-btn-ghost" hidden>Remove image</button>
 
-        <button id="liGenerateBtn" class="li-btn">Write the post</button>
+        <!-- Input is strictly the image, output will be text + hashtags -->
+
+        <div class="li-actions">
+            <button id="liGenerateBtn" class="li-btn">Generate AI Captions</button>
+            <button id="liRegenerateBtn" class="li-btn li-btn-outline" disabled>Regenerate</button>
+        </div>
         <p id="liStatus" class="li-status" aria-live="polite"></p>
     </div>
 
+    <!-- Results Card (Vertical Alignment)[cite: 1, 4, 5] -->
     <div id="liResultCard" class="li-card" hidden>
-        <h2>Result</h2>
-        <div id="liPost" class="li-output"></div>
-        <button id="liCopyBtn" class="li-btn-secondary" style="margin-top:14px;">Copy</button>
+        <h2 class="li-title-main">Generated Options</h2>
+        <div class="li-vertical-stack">
+            <div class="li-result-item">
+                <div class="li-result-meta"><span class="li-badge">Professional</span><button class="li-copy-btn" data-target="liPost0">Copy</button></div>
+                <div id="liPost0" class="li-output"></div>
+            </div>
+            <div class="li-result-item">
+                <div class="li-result-meta"><span class="li-badge">Short</span><button class="li-copy-btn" data-target="liPost1">Copy</button></div>
+                <div id="liPost1" class="li-output"></div>
+            </div>
+            <div class="li-result-item">
+                <div class="li-result-meta"><span class="li-badge">Storytelling</span><button class="li-copy-btn" data-target="liPost2">Copy</button></div>
+                <div id="liPost2" class="li-output"></div>
+            </div>
+        </div>
     </div>
 </div>
