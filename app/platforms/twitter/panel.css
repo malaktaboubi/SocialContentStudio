@@ -1,101 +1,188 @@
-/* Twitter / X panel — scoped to .tw-panel (Pattern Analytics). */
-
 .tw-panel {
     --tw-accent: #1d9bf0;
-    max-width: 720px;
+    max-width: 600px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
+    padding-bottom: 40px;
 }
 
-.tw-panel .tw-card {
+.tw-card {
     background: var(--surface, #0f0f1a);
     border: 1px solid var(--border, rgba(255,255,255,0.08));
-    border-radius: 18px;
+    border-radius: 16px;
     padding: 24px;
-    color: var(--ink, #e8e8f0);
 }
 
 .tw-panel h2 {
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--tw-accent);
-    margin-bottom: 6px;
+    font-size: 18px;
+    color: #fff;
+    margin-bottom: 8px;
 }
 
-.tw-panel .tw-sub {
+.tw-sub {
     color: var(--ink-dim, #9fa3c7);
     font-size: 14px;
-    margin-bottom: 18px;
-    line-height: 1.5;
+    margin-bottom: 20px;
 }
 
-.tw-panel .tw-label {
+.tw-label {
     display: block;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
+    font-size: 12px;
     color: var(--ink-muted, #595f7f);
     margin-bottom: 6px;
+    text-transform: uppercase;
 }
 
-.tw-panel .tw-input {
+.tw-input {
     width: 100%;
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid var(--border, rgba(255,255,255,0.08));
     background: var(--bg, #09090f);
-    color: var(--ink, #e8e8f0);
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    border-radius: 8px;
+    padding: 10px;
+    color: #fff;
     font-family: inherit;
-    font-size: 15px;
-    margin-bottom: 14px;
-    line-height: 1.5;
-}
-.tw-panel .tw-input:focus {
-    outline: none;
-    border-color: var(--tw-accent);
-    box-shadow: 0 0 0 2px rgba(29,155,240,0.18);
+    margin-bottom: 16px;
 }
 
-.tw-panel .tw-btn,
-.tw-panel .tw-btn-secondary {
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 11px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    border: none;
+.tw-record-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
 }
-.tw-panel .tw-btn {
+
+.tw-record-ring {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.tw-record-ring-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.tw-record-ring-track {
+    fill: none;
+    stroke: rgba(255,255,255,0.05);
+    stroke-width: 4;
+}
+
+.tw-record-ring-arc {
+    fill: none;
+    stroke: var(--tw-accent);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 408;
+    stroke-dashoffset: 408;
+    transition: stroke-dashoffset 0.2s linear;
+}
+
+.tw-record-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--tw-accent);
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tw-timer {
+    font-family: monospace;
+    font-size: 20px;
+    color: var(--tw-accent);
+}
+
+.tw-processing-card, .tw-post-card {
+    display: none;
+}
+
+.tw-processing-card.active, .tw-post-card.active {
+    display: block;
+}
+
+.tw-progress-bar-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.tw-progress-bar-fill {
+    height: 100%;
+    background: var(--tw-accent);
+    transition: width 0.3s ease;
+}
+
+.tw-progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--ink-dim, #9fa3c7);
+}
+
+.tw-transcript-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border, rgba(255,255,255,0.08));
+}
+
+.tw-transcript-text {
+    font-style: italic;
+    color: var(--ink, #e8e8f0);
+}
+
+.tw-btn {
+    width: 100%;
     background: var(--tw-accent);
     color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 16px;
 }
-.tw-panel .tw-btn:hover { filter: brightness(1.08); }
-.tw-panel .tw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.tw-panel .tw-btn-secondary {
-    background: rgba(29,155,240,0.12);
+.tw-btn-secondary {
+    background: transparent;
     color: var(--tw-accent);
-    border: 1px solid rgba(29,155,240,0.4);
-}
-.tw-panel .tw-btn-secondary:hover { background: rgba(29,155,240,0.2); }
-
-.tw-panel .tw-status {
+    border: 1px solid var(--tw-accent);
+    border-radius: 20px;
+    padding: 8px 16px;
     font-size: 13px;
-    color: var(--ink-muted, #595f7f);
-    min-height: 1.2em;
-    margin-top: 10px;
+    cursor: pointer;
 }
 
-.tw-panel .tw-output {
-    white-space: pre-wrap;
-    line-height: 1.6;
-    background: var(--bg, #09090f);
-    border: 1px solid var(--border, rgba(255,255,255,0.08));
-    border-radius: 10px;
-    padding: 16px;
-    color: var(--ink, #e8e8f0);
+.tw-regen-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.tw-post-image {
+    width: 100%;
+    border-radius: 12px;
+    margin: 16px 0;
+}
+
+.tw-image-prompt-details summary {
+    font-size: 12px;
+    color: var(--tw-accent);
+    cursor: pointer;
+    margin-bottom: 8px;
 }

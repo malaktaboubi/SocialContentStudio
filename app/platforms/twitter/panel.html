@@ -1,25 +1,74 @@
 <div class="tw-panel">
     <div class="tw-card">
-        <h2>Twitter / X post</h2>
-        <p class="tw-sub">Describe your idea, pick a tone, and get a short post you can paste into the timeline.</p>
+        <h2>Create a Tweet</h2>
+        <p class="tw-sub">Speak your thoughts and generate a punchy Tweet with a matching AI image.</p>
 
-        <label class="tw-label" for="twTopic">What's it about?</label>
-        <textarea id="twTopic" class="tw-input" rows="5" placeholder="e.g. Shipped a new feature today — here's what we learned..."></textarea>
+        <div class="tw-tone-row">
+            <label for="twToneSelect" class="tw-label">Tone / style</label>
+            <select id="twToneSelect" class="tw-input"></select>
+        </div>
 
-        <label class="tw-label" for="twTone">Tone</label>
-        <select id="twTone" class="tw-input">
-            <option value="casual">Casual</option>
-            <option value="thread">Thread-style</option>
-            <option value="newsy">Newsy</option>
-        </select>
+        <div class="tw-record-section">
+            <div class="tw-record-ring">
+                <svg class="tw-record-ring-svg" viewBox="0 0 148 148">
+                    <circle class="tw-record-ring-track" cx="74" cy="74" r="65"></circle>
+                    <circle class="tw-record-ring-arc" cx="74" cy="74" r="65" id="twRingArc"></circle>
+                </svg>
+                <button id="twRecordBtn" type="button" class="tw-record-button">
+                    <span id="twBtnIcon">⏺</span>
+                </button>
+            </div>
 
-        <button id="twGenerateBtn" class="tw-btn">Generate post</button>
-        <p id="twStatus" class="tw-status" aria-live="polite"></p>
+            <div class="tw-record-label">
+                <span id="twBtnText">Start Recording</span>
+                <span id="twTimer" class="tw-timer" style="display:none;">0:00</span>
+            </div>
+
+            <div id="twStatusBox" class="tw-status-box">
+                <div id="twStatusText"></div>
+            </div>
+        </div>
     </div>
 
-    <div id="twResultCard" class="tw-card" hidden>
-        <h2>Result</h2>
-        <div id="twPost" class="tw-output"></div>
-        <button id="twCopyBtn" class="tw-btn-secondary" style="margin-top:14px;">Copy</button>
+    <div class="tw-card tw-processing-card" id="twProcessingCard">
+        <div class="tw-progress-bar-track">
+            <div class="tw-progress-bar-fill" id="twProgressBarFill" style="width: 0%"></div>
+        </div>
+        <div class="tw-progress-meta">
+            <span id="twProgressMessage">Starting…</span>
+            <span id="twProgressPercent">0%</span>
+        </div>
+        <div id="twTranscriptSection" class="tw-transcript-section" style="display:none;">
+            <div class="tw-label">Heard:</div>
+            <div id="twTranscriptText" class="tw-transcript-text"></div>
+        </div>
+    </div>
+
+    <div class="tw-card tw-post-card" id="twPostCard">
+        <div id="twPostCardBody">
+            <div class="tw-post-meta">
+                <span class="tw-user-name">User</span>
+                <span class="tw-user-handle">@voice_ai</span>
+            </div>
+
+            <label class="tw-label" for="twEditBody">Tweet</label>
+            <textarea class="tw-input tw-post-field" id="twEditBody" rows="5" maxlength="280"></textarea>
+
+            <details class="tw-image-prompt-details">
+                <summary>Edit Image Prompt</summary>
+                <textarea class="tw-input tw-post-field" id="twEditImagePrompt" rows="3"></textarea>
+            </details>
+
+            <div class="tw-regen-row">
+                <button type="button" class="tw-btn-secondary" id="twRegenTextBtn">↻ Regenerate text</button>
+                <button type="button" class="tw-btn-secondary" id="twRegenImageBtn">↻ Regenerate image</button>
+            </div>
+
+            <div class="tw-post-image-wrap">
+                <img class="tw-post-image" id="twPostImage" src="" alt="Generated visual" style="display:none;">
+            </div>
+            
+            <button type="button" class="tw-btn" id="twCopyBtn">Copy Tweet</button>
+        </div>
     </div>
 </div>
