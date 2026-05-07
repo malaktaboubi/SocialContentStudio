@@ -34,14 +34,19 @@ logging.basicConfig(
 log = logging.getLogger("twitter.pipeline")
 
 CUDA_AVAILABLE = torch.cuda.is_available()
-WHISPER_MODEL_ID = os.getenv("WHISPER_MODEL_ID", "base" if CUDA_AVAILABLE else "tiny")
+WHISPER_MODEL_ID = os.getenv("WHISPER_MODEL_ID", "base")
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "nvidia/nemotron-3-super-120b-a12b:free")
 USE_OPENROUTER = os.getenv("USE_OPENROUTER", "true").lower() == "true"
 
 HF_TOKEN = os.getenv("HF_TOKEN", "")
-HF_IMAGE_MODEL = os.getenv("HF_IMAGE_MODEL", "black-forest-labs/FLUX.1-schnell")
+HF_IMAGE_MODELS = [
+    os.getenv("HF_IMAGE_MODEL", "black-forest-labs/FLUX.1-schnell"),
+    "stabilityai/stable-diffusion-2-1",
+    "runwayml/stable-diffusion-v1-5",
+    "stabilityai/sdxl-turbo"
+]
 
 USE_POLLINATIONS_IMAGE = os.getenv("USE_POLLINATIONS_IMAGE", "true").lower() == "true"
 
@@ -306,12 +311,12 @@ def _hf_client() -> InferenceClient:
     return InferenceClient(token=HF_TOKEN, timeout=180)
 
 
-def _generate_image_huggingface(prompt: str) -> str:
+def _generate_image_huggingface(prompt: str, model_id: str) -> str:
     if not HF_TOKEN:
         raise RuntimeError("HF_TOKEN not set")
 
-    log.info("HuggingFace: model=%s", HF_IMAGE_MODEL)
-    image = _hf_client().text_to_image(prompt[:500], model=HF_IMAGE_MODEL)
+    log.info("HuggingFace: model=%s", model_id)
+    image = _hf_client().text_to_image(prompt[:500], model=model_id)
 
     buf = io.BytesIO()
     image.save(buf, format="PNG")
@@ -319,12 +324,13 @@ def _generate_image_huggingface(prompt: str) -> str:
     return _save_image_bytes(image_bytes)
 
 
-def _generate_image_pollinations(prompt: str) -> str:
+def _generate_image_pollinations(prompt: str, use_flux: bool = True) -> str:
     encoded = urllib.parse.quote(prompt[:400])
     seed = int(time.time())
+    model_param = "&model=flux" if use_flux else ""
     url = (
         f"https://image.pollinations.ai/prompt/{encoded}"
-        f"?width=768&height=512&nologo=true&model=flux&seed={seed}"
+        f"?width=768&height=512&nologo=true{model_param}&seed={seed}"
     )
     req = urllib.request.Request(
         url,
@@ -341,22 +347,30 @@ def _generate_image_pollinations(prompt: str) -> str:
 
 def generate_image(prompt: str) -> str:
     log.info("generate_image: prompt=%s", prompt[:120])
-    providers = []
+    
+    # 1. Try Hugging Face models one by one
     if HF_TOKEN:
-        providers.append(("HuggingFace", _generate_image_huggingface))
-    if USE_POLLINATIONS_IMAGE:
-        providers.append(("Pollinations", _generate_image_pollinations))
-
-    if not providers:
-        return ""
-
-    for name, fn in providers:
-        for attempt in range(2):
+        for model_id in HF_IMAGE_MODELS:
             try:
-                url = fn(prompt)
-                return url
+                return _generate_image_huggingface(prompt, model_id)
             except Exception as exc:
-                log.warning("%s attempt %d failed: %s", name, attempt + 1, exc)
-                if attempt == 0:
-                    time.sleep(2)
+                log.warning("HuggingFace (%s) failed: %s", model_id, exc)
+                if "402" in str(exc):
+                    continue # Try next model if credits depleted
+                break # Other errors might be prompt related, stop trying HF
+
+    # 2. Try Pollinations (Flux)
+    if USE_POLLINATIONS_IMAGE:
+        try:
+            return _generate_image_pollinations(prompt, use_flux=True)
+        except Exception as exc:
+            log.warning("Pollinations (Flux) failed: %s", exc)
+
+        # 3. Final Fallback: Pollinations (Standard)
+        try:
+            log.info("Attempting Pollinations final fallback (standard model)")
+            return _generate_image_pollinations(prompt, use_flux=False)
+        except Exception as exc:
+            log.error("All image generation providers failed: %s", exc)
+
     return ""
