@@ -1,10 +1,8 @@
-"""Reddit-only pipeline: Whisper STT + OpenRouter text + free image providers.
-
-Reddit module only (Pattern Analytics). Other platform folders do NOT import from here.
-"""
+"""Pinterest-only pipeline: Whisper STT + OpenRouter text/vision + image generation."""
 
 from __future__ import annotations
 
+import base64
 import gc
 import io
 import json
@@ -31,13 +29,14 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
-log = logging.getLogger("reddit.pipeline")
+log = logging.getLogger("pinterest.pipeline")
 
 CUDA_AVAILABLE = torch.cuda.is_available()
 WHISPER_MODEL_ID = os.getenv("WHISPER_MODEL_ID", "base" if CUDA_AVAILABLE else "tiny")
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "nvidia/nemotron-3-super-120b-a12b:free")
+OPENROUTER_VISION_MODEL = os.getenv("OPENROUTER_VISION_MODEL", "google/gemini-2.0-flash-001")
 USE_OPENROUTER = os.getenv("USE_OPENROUTER", "true").lower() == "true"
 
 HF_TOKEN = os.getenv("HF_TOKEN", "")
@@ -51,13 +50,11 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 
 def _configure_ffmpeg() -> None:
     ffmpeg_path = Path(imageio_ffmpeg.get_ffmpeg_exe())
-    alias_dir = Path(tempfile.gettempdir()) / "voice_to_reddit_ffmpeg"
+    alias_dir = Path(tempfile.gettempdir()) / "voice_to_pinterest_ffmpeg"
     alias_dir.mkdir(parents=True, exist_ok=True)
     alias_path = alias_dir / "ffmpeg.exe"
-
     if not alias_path.exists():
         shutil.copy2(ffmpeg_path, alias_path)
-
     current_path = os.environ.get("PATH", "")
     alias_dir_str = str(alias_dir)
     if alias_dir_str not in current_path:
@@ -97,7 +94,6 @@ def _post_json(url: str, payload: dict, headers: dict, timeout: int = 120) -> di
     request = urllib.request.Request(url=url, data=data, method="POST")
     for key, value in headers.items():
         request.add_header(key, value)
-
     with urllib.request.urlopen(request, timeout=timeout) as response:
         body = response.read().decode("utf-8")
     return json.loads(body)
@@ -105,37 +101,30 @@ def _post_json(url: str, payload: dict, headers: dict, timeout: int = 120) -> di
 
 TONE_PRESETS: Dict[str, str] = {
     "default": (
-        "Tone: general Reddit — conversational, authentic, and engaging."
+        "Tone: inspirational and warm — descriptive, inviting, perfect for Pinterest boards."
     ),
-    "eli5": (
-        "Tone: explain like I'm five — very simple words, friendly analogies, no jargon; "
-        "still readable as a real Reddit post."
+    "aesthetic": (
+        "Tone: aesthetic and poetic — dreamy language, focus on beauty and mood."
     ),
-    "rant": (
-        "Tone: passionate rant — strong voice and emotion; mix short punchy lines with longer vents; "
-        "never use slurs or hate; stay readable."
+    "diy": (
+        "Tone: practical DIY — step-hint language, helpful and encouraging."
     ),
-    "askreddit": (
-        "Tone: r/AskReddit — title sparks discussion or stories; body adds context or a follow-up; "
-        "curious, inclusive, and inviting."
+    "travel": (
+        "Tone: wanderlust travel — evocative, adventurous, makes readers want to go there."
     ),
-    "humor": (
-        "Tone: witty and light — jokes and sarcasm welcome; stay kind and avoid punching down."
-    ),
-    "professional": (
-        "Tone: calm and informative — clear paragraphs, minimal slang, helpful and neutral."
+    "fashion": (
+        "Tone: fashion-forward — stylish, trendy, uses relevant fashion vocabulary."
     ),
 }
 
 DEFAULT_TONE_ID = "default"
 
 _TONE_LABELS: Dict[str, str] = {
-    "default": "General Reddit",
-    "eli5": "ELI5",
-    "rant": "Rant",
-    "askreddit": "r/AskReddit style",
-    "humor": "Humor / witty",
-    "professional": "Professional",
+    "default": "Inspirational",
+    "aesthetic": "Aesthetic / Poetic",
+    "diy": "DIY / Tutorial",
+    "travel": "Travel / Wanderlust",
+    "fashion": "Fashion / Style",
 }
 
 
@@ -157,53 +146,66 @@ def resolve_tone_id(tone_id: Optional[str]) -> str:
 def _build_messages(transcript: str, tone_id: str) -> list:
     tone_line = TONE_PRESETS.get(tone_id, TONE_PRESETS[DEFAULT_TONE_ID])
     system_msg = (
-        "You are an expert Social Media Manager and Reddit content creator. "
+        "You are an expert Pinterest content creator and social media strategist. "
         f"{tone_line} "
-<<<<<<< Updated upstream
-        "Convert the user's transcript into a complete Reddit post. "
-        "Respond with ONLY a single JSON object, no preamble, no markdown fences, no commentary. "
-        "Required keys exactly: reddit_title, reddit_body, image_prompt. "
-        "reddit_title: short, attention-grabbing (max 300 chars). "
-        "reddit_body: 2-4 paragraphs matching the tone above. "
-        "image_prompt: descriptive text-to-image prompt aligned with the post. "
-        "If the transcript is too short or unclear, infer a creative interpretation."
-=======
-        "Your task is to TRANSFORM the user's spoken transcript into a high-quality, engaging Reddit post. "
-        "DO NOT just repeat the transcript. Synthesize the key points into a compelling title and body. "
+        "Your task is to TRANSFORM the user's input into a high-quality Pinterest pin description. "
+        "DO NOT just repeat the input. Create an engaging, inspiring description. "
         "Respond with ONLY a single JSON object. No markdown, no preamble. "
-        "Required keys: reddit_title, reddit_body, image_prompt. "
-        "reddit_title: A short, attention-grabbing title (max 300 chars). "
-        "reddit_body: 2-4 paragraphs of engaging content matching the tone. "
-        "image_prompt: A highly detailed, artistic text-to-image prompt that visually represents the core concept of the post."
->>>>>>> Stashed changes
+        "Required keys: pinterest_caption, hashtags, image_prompt. "
+        "pinterest_caption: An inspiring Pinterest description (150-300 words), storytelling style. "
+        "hashtags: 20-30 relevant Pinterest hashtags as a single string. "
+        "image_prompt: A detailed vertical image prompt (2:3 ratio) for text-to-image generation."
     )
-    user_msg = f"TRANSCRIPT TO TRANSFORM:\n{transcript}\n\nReturn the JSON object now:"
+    user_msg = f"INPUT TO TRANSFORM:\n{transcript}\n\nReturn the JSON object now:"
     return [
         {"role": "system", "content": system_msg},
         {"role": "user", "content": user_msg},
     ]
 
 
+def _build_vision_messages(image_b64: str, mime_type: str, tone_id: str) -> list:
+    tone_line = TONE_PRESETS.get(tone_id, TONE_PRESETS[DEFAULT_TONE_ID])
+    system_msg = (
+        "You are an expert Pinterest content creator. "
+        f"{tone_line} "
+        "Analyze the image and create a Pinterest pin description. "
+        "Respond with ONLY a single JSON object. No markdown, no preamble. "
+        "Required keys: pinterest_caption, hashtags, image_prompt. "
+        "pinterest_caption: An inspiring Pinterest description (150-300 words). "
+        "hashtags: 20-30 relevant Pinterest hashtags as a single string. "
+        "image_prompt: A detailed vertical image prompt (2:3 ratio) based on the image."
+    )
+    return [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:{mime_type};base64,{image_b64}"
+                    },
+                },
+                {"type": "text", "text": system_msg},
+            ],
+        }
+    ]
+
+
 def _extract_json(text: str) -> Optional[dict]:
-    """Robustly extract a JSON object from LLM output."""
     if not text:
         return None
-
     cleaned = text.strip()
     cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
     cleaned = re.sub(r"\s*```\s*$", "", cleaned)
-
     try:
         obj = json.loads(cleaned)
         if isinstance(obj, dict):
             return obj
     except json.JSONDecodeError:
         pass
-
     start = cleaned.find("{")
     if start == -1:
         return None
-
     depth = 0
     in_string = False
     escape = False
@@ -225,40 +227,39 @@ def _extract_json(text: str) -> Optional[dict]:
         elif ch == "}":
             depth -= 1
             if depth == 0:
-                candidate = cleaned[start : i + 1]
+                candidate = cleaned[start: i + 1]
                 try:
                     obj = json.loads(candidate)
                     if isinstance(obj, dict):
                         return obj
                 except json.JSONDecodeError:
                     break
-
-    truncated = cleaned[start:]
-    for repair in (truncated + '"}', truncated + "}", truncated + '" }'):
-        try:
-            obj = json.loads(repair)
-            if isinstance(obj, dict):
-                return obj
-        except json.JSONDecodeError:
-            continue
-
     return None
 
 
 def _fallback_content(transcript: str) -> Dict[str, str]:
-    snippet = transcript.strip() or "a creative idea"
+    snippet = transcript.strip() or "a beautiful moment"
     return {
-        "reddit_title": f"Thought: {snippet[:80]}...",
-        "reddit_body": f"I've been thinking about this lately: {snippet}. What do you all think?",
-        "image_prompt": f"Detailed digital art illustration representing: {snippet[:100]}, vibrant colors, cinematic lighting.",
+        "pinterest_caption": (
+            f"Discover the beauty in everyday moments. {snippet[:200]} "
+            "Save this pin to your board and share the inspiration with others!"
+        ),
+        "hashtags": (
+            "#pinterest #inspiration #lifestyle #beautiful #aesthetic "
+            "#inspo #pinoftheday #style #creative #mood"
+        ),
+        "image_prompt": (
+            f"Beautiful vertical Pinterest-style photograph representing: {snippet[:100]}, "
+            "warm lighting, aesthetic composition, 2:3 ratio"
+        ),
     }
 
 
 def _normalize_content(obj: dict, transcript: str) -> Dict[str, str]:
     fallback = _fallback_content(transcript)
     return {
-        "reddit_title": str(obj.get("reddit_title") or fallback["reddit_title"])[:300],
-        "reddit_body": str(obj.get("reddit_body") or fallback["reddit_body"]),
+        "pinterest_caption": str(obj.get("pinterest_caption") or fallback["pinterest_caption"]),
+        "hashtags": str(obj.get("hashtags") or fallback["hashtags"]),
         "image_prompt": str(obj.get("image_prompt") or fallback["image_prompt"])[:500],
     }
 
@@ -268,43 +269,62 @@ def _generate_via_openrouter(transcript: str, tone_id: str) -> Dict[str, str]:
     payload = {
         "model": OPENROUTER_MODEL,
         "messages": _build_messages(transcript, tone_id),
-        "temperature": 0.7,
-        "max_tokens": 800,
+        "temperature": 0.8,
+        "max_tokens": 600,
     }
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
         "HTTP-Referer": "http://localhost:8000",
-        "X-Title": "voice-to-reddit",
+        "X-Title": "voice-to-pinterest",
     }
     response = _post_json(
         "https://openrouter.ai/api/v1/chat/completions", payload, headers
     )
-
     if "error" in response:
         raise RuntimeError(f"OpenRouter error: {response['error']}")
-
     message = response["choices"][0]["message"]["content"]
     log.info("OpenRouter: raw output (%d chars): %s", len(message), message[:300])
-
     obj = _extract_json(message)
     if obj is None:
         log.warning("OpenRouter: failed to extract JSON, using fallback")
         return _fallback_content(transcript)
-
-    result = _normalize_content(obj, transcript)
-    log.info("OpenRouter: parsed title=%s", result["reddit_title"][:80])
-    return result
+    return _normalize_content(obj, transcript)
 
 
-def generate_reddit_content(
+def _generate_via_vision(image_b64: str, mime_type: str, tone_id: str) -> Dict[str, str]:
+    log.info("OpenRouter Vision: model=%s tone=%s", OPENROUTER_VISION_MODEL, tone_id)
+    payload = {
+        "model": OPENROUTER_VISION_MODEL,
+        "messages": _build_vision_messages(image_b64, mime_type, tone_id),
+        "temperature": 0.8,
+        "max_tokens": 600,
+    }
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "http://localhost:8000",
+        "X-Title": "voice-to-pinterest",
+    }
+    response = _post_json(
+        "https://openrouter.ai/api/v1/chat/completions", payload, headers
+    )
+    if "error" in response:
+        raise RuntimeError(f"OpenRouter Vision error: {response['error']}")
+    message = response["choices"][0]["message"]["content"]
+    obj = _extract_json(message)
+    if obj is None:
+        return _fallback_content("image input")
+    return _normalize_content(obj, "image input")
+
+
+def generate_pinterest_content(
     transcript: str, tone_id: str = DEFAULT_TONE_ID
 ) -> Dict[str, str]:
     tone_key = resolve_tone_id(tone_id)
     if not USE_OPENROUTER or not OPENROUTER_API_KEY:
         log.warning("OpenRouter disabled or no key, using fallback")
         return _fallback_content(transcript)
-
     try:
         return _generate_via_openrouter(transcript, tone_key)
     except Exception as exc:
@@ -312,11 +332,24 @@ def generate_reddit_content(
         return _fallback_content(transcript)
 
 
+def generate_pinterest_content_from_image(
+    image_b64: str, mime_type: str, tone_id: str = DEFAULT_TONE_ID
+) -> Dict[str, str]:
+    tone_key = resolve_tone_id(tone_id)
+    if not USE_OPENROUTER or not OPENROUTER_API_KEY:
+        return _fallback_content("image input")
+    try:
+        return _generate_via_vision(image_b64, mime_type, tone_key)
+    except Exception as exc:
+        log.error("Vision generation failed: %s", exc)
+        return _fallback_content("image input")
+
+
 def _save_image_bytes(image_bytes: bytes) -> str:
     filename = f"{uuid.uuid4()}.png"
     path = OUTPUT_DIR / filename
     path.write_bytes(image_bytes)
-    return f"/api/reddit/images/{filename}"
+    return f"/api/pinterest/images/{filename}"
 
 
 @lru_cache(maxsize=1)
@@ -327,15 +360,11 @@ def _hf_client() -> InferenceClient:
 def _generate_image_huggingface(prompt: str) -> str:
     if not HF_TOKEN:
         raise RuntimeError("HF_TOKEN not set")
-
     log.info("HuggingFace: model=%s", HF_IMAGE_MODEL)
     image = _hf_client().text_to_image(prompt[:500], model=HF_IMAGE_MODEL)
-
     buf = io.BytesIO()
     image.save(buf, format="PNG")
-    image_bytes = buf.getvalue()
-    log.info("HuggingFace: got %d bytes", len(image_bytes))
-    return _save_image_bytes(image_bytes)
+    return _save_image_bytes(buf.getvalue())
 
 
 def _generate_image_pollinations(prompt: str) -> str:
@@ -343,51 +372,31 @@ def _generate_image_pollinations(prompt: str) -> str:
     seed = int(time.time())
     url = (
         f"https://image.pollinations.ai/prompt/{encoded}"
-        f"?width=768&height=512&nologo=true&model=flux&seed={seed}"
+        f"?width=768&height=1152&nologo=true&model=flux&seed={seed}"
     )
-    log.info("Pollinations: requesting...")
     req = urllib.request.Request(
         url,
         headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0) voice-to-reddit/1.0",
+            "User-Agent": "Mozilla/5.0 voice-to-pinterest/1.0",
             "Referer": "http://localhost:8000/",
             "Accept": "image/*",
         },
     )
     with urllib.request.urlopen(req, timeout=120) as resp:
         image_bytes = resp.read()
-
-    if len(image_bytes) < 1000:
-        raise RuntimeError(f"Pollinations returned tiny payload: {len(image_bytes)} bytes")
-
-    log.info("Pollinations: got %d bytes", len(image_bytes))
     return _save_image_bytes(image_bytes)
 
 
 def generate_image(prompt: str) -> str:
-    """Try multiple free image providers. Returns image URL or '' on total failure."""
     log.info("generate_image: prompt=%s", prompt[:120])
-
-    providers = []
     if HF_TOKEN:
-        providers.append(("HuggingFace", _generate_image_huggingface))
+        try:
+            return _generate_image_huggingface(prompt)
+        except Exception as exc:
+            log.warning("HuggingFace failed: %s", exc)
     if USE_POLLINATIONS_IMAGE:
-        providers.append(("Pollinations", _generate_image_pollinations))
-
-    if not providers:
-        log.error("No image providers configured")
-        return ""
-
-    for name, fn in providers:
-        for attempt in range(2):
-            try:
-                url = fn(prompt)
-                log.info("%s: success url=%s", name, url)
-                return url
-            except Exception as exc:
-                log.warning("%s attempt %d failed: %s", name, attempt + 1, exc)
-                if attempt == 0:
-                    time.sleep(3)
-
-    log.error("All image providers failed")
+        try:
+            return _generate_image_pollinations(prompt)
+        except Exception as exc:
+            log.error("Pollinations failed: %s", exc)
     return ""

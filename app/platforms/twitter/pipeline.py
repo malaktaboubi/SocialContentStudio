@@ -155,7 +155,7 @@ def _build_messages(transcript: str, tone_id: str) -> list:
         "Your task is to TRANSFORM the user's spoken transcript into a high-quality, engaging Tweet. "
         "DO NOT just repeat the transcript. Synthesize the key points into a punchy post. "
         "Respond with ONLY a single JSON object. No markdown, no preamble. "
-        "Required keys: twitter_body, image_prompt. "
+        "Required JSON keys exactly: twitter_body, image_prompt. "
         "twitter_body: The tweet text (max 280 chars), including relevant hashtags and emojis. "
         "image_prompt: A highly detailed, artistic text-to-image prompt that visually represents the core concept of the tweet."
     )
@@ -233,26 +233,35 @@ def _extract_json(text: str) -> Optional[dict]:
 def _fallback_content(transcript: str) -> Dict[str, str]:
     snippet = transcript.strip() or "a creative idea"
     return {
-        "twitter_body": f"Thinking about: {snippet[:200]}... #innovation #creativity",
+        "twitter_body": f"{snippet} #innovation #creativity #ai",
         "image_prompt": f"Dynamic and vibrant digital art illustration representing: {snippet[:100]}",
     }
 
 
 def _normalize_content(obj: dict, transcript: str) -> Dict[str, str]:
     fallback = _fallback_content(transcript)
+    # Check for various possible keys the LLM might return
+    body = (
+        obj.get("twitter_body") or 
+        obj.get("tweet_body") or 
+        obj.get("tweet") or 
+        obj.get("caption") or 
+        obj.get("post") or
+        fallback["twitter_body"]
+    )
     return {
-        "twitter_body": str(obj.get("twitter_body") or fallback["twitter_body"])[:280],
+        "twitter_body": str(body)[:280],
         "image_prompt": str(obj.get("image_prompt") or fallback["image_prompt"])[:500],
     }
 
 
-def _generate_via_openrouter(transcript: str, tone_id: str) -> Dict[str, str]:
-    log.info("OpenRouter: model=%s tone=%s", OPENROUTER_MODEL, tone_id)
+def _generate_via_openrouter(transcript: str, tone_id: str, model_id: str) -> Dict[str, str]:
+    log.info("OpenRouter: model=%s tone=%s", model_id, tone_id)
     payload = {
-        "model": OPENROUTER_MODEL,
+        "model": model_id,
         "messages": _build_messages(transcript, tone_id),
         "temperature": 0.7,
-        "max_tokens": 400,
+        "max_tokens": 500,
     }
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
@@ -260,23 +269,32 @@ def _generate_via_openrouter(transcript: str, tone_id: str) -> Dict[str, str]:
         "HTTP-Referer": "http://localhost:8000",
         "X-Title": "voice-to-twitter",
     }
-    response = _post_json(
-        "https://openrouter.ai/api/v1/chat/completions", payload, headers
-    )
+    try:
+        response = _post_json(
+            "https://openrouter.ai/api/v1/chat/completions", payload, headers
+        )
+    except Exception as e:
+        log.error("OpenRouter request failed for model %s: %s", model_id, e)
+        raise
 
     if "error" in response:
-        raise RuntimeError(f"OpenRouter error: {response['error']}")
+        error_msg = response["error"].get("message", str(response["error"]))
+        log.error("OpenRouter returned error for model %s: %s", model_id, error_msg)
+        raise RuntimeError(f"OpenRouter error: {error_msg}")
+
+    if not response.get("choices"):
+        log.error("OpenRouter returned no choices for model %s: %s", model_id, response)
+        raise RuntimeError("No response from AI model")
 
     message = response["choices"][0]["message"]["content"]
     log.info("OpenRouter: raw output (%d chars): %s", len(message), message[:300])
 
     obj = _extract_json(message)
     if obj is None:
-        log.warning("OpenRouter: failed to extract JSON, using fallback")
-        return _fallback_content(transcript)
+        log.warning("OpenRouter: failed to extract JSON from model %s", model_id)
+        return None
 
-    result = _normalize_content(obj, transcript)
-    return result
+    return _normalize_content(obj, transcript)
 
 
 def generate_twitter_content(
@@ -287,11 +305,26 @@ def generate_twitter_content(
         log.warning("OpenRouter disabled or no key, using fallback")
         return _fallback_content(transcript)
 
-    try:
-        return _generate_via_openrouter(transcript, tone_key)
-    except Exception as exc:
-        log.error("OpenRouter generation failed: %s", exc)
-        return _fallback_content(transcript)
+    # List of models to try in order of preference
+    models_to_try = [
+        OPENROUTER_MODEL,  # User's primary model
+        "google/gemini-2.0-flash-lite-001",  # Fast, reliable fallback
+        "mistralai/mistral-7b-instruct:free", # Free fallback
+    ]
+
+    for model in models_to_try:
+        if not model:
+            continue
+        try:
+            result = _generate_via_openrouter(transcript, tone_key, model)
+            if result:
+                return result
+        except Exception as exc:
+            log.warning("OpenRouter attempt with %s failed: %s", model, exc)
+            continue
+
+    log.error("All OpenRouter models failed, using hard fallback")
+    return _fallback_content(transcript)
 
 
 def _save_image_bytes(image_bytes: bytes) -> str:

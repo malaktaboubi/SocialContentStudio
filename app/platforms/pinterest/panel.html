@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pinterest</title>
+  <link rel="stylesheet" href="/platforms/pinterest/panel.css" />
+</head>
+<body>
+<div class="pinterest-panel">
+
+  <!-- HEADER -->
+  <div class="pin-header">
+    <span class="pin-logo">📌</span>
+    <div>
+      <h1>Pinterest Content Generator</h1>
+      <p>Upload an image or record your voice → get an inspiring Pinterest pin</p>
+    </div>
+  </div>
+
+  <!-- TONE SELECTOR -->
+  <div class="pin-section">
+    <label class="pin-label">Tone</label>
+    <select id="pin-tone" class="pin-select">
+      <option value="default">Inspirational</option>
+      <option value="aesthetic">Aesthetic / Poetic</option>
+      <option value="diy">DIY / Tutorial</option>
+      <option value="travel">Travel / Wanderlust</option>
+      <option value="fashion">Fashion / Style</option>
+    </select>
+  </div>
+
+  <!-- TABS -->
+  <div class="pin-tabs">
+    <button class="pin-tab active" data-tab="image">🖼 Upload Image</button>
+    <button class="pin-tab" data-tab="voice">🎙 Record Voice</button>
+  </div>
+
+  <!-- IMAGE TAB -->
+  <div id="tab-image" class="pin-tab-content active">
+    <div class="pin-dropzone" id="pin-dropzone">
+      <input type="file" id="pin-image-input" accept="image/*" hidden />
+      <div class="pin-drop-inner" id="pin-drop-inner">
+        <span class="pin-drop-icon">📁</span>
+        <p>Drag & drop an image or <strong>click to browse</strong></p>
+      </div>
+      <img id="pin-preview" class="pin-preview" hidden />
+    </div>
+    <button class="pin-btn" id="pin-image-btn" disabled>✨ Generate Pin from Image</button>
+  </div>
+
+  <!-- VOICE TAB -->
+  <div id="tab-voice" class="pin-tab-content">
+    <div class="pin-recorder">
+      <button class="pin-record-btn" id="pin-record-btn">🎙 Start Recording</button>
+      <span id="pin-record-status" class="pin-record-status">Not recording</span>
+    </div>
+    <button class="pin-btn" id="pin-voice-btn" disabled>✨ Generate Pin from Voice</button>
+  </div>
+
+  <!-- PROGRESS -->
+  <div id="pin-progress" class="pin-progress" hidden>
+    <div class="pin-progress-bar"><div id="pin-progress-fill" class="pin-progress-fill"></div></div>
+    <p id="pin-progress-msg" class="pin-progress-msg">Processing...</p>
+  </div>
+
+  <!-- RESULT -->
+  <div id="pin-result" class="pin-result" hidden>
+
+    <div class="pin-result-grid">
+
+      <!-- LEFT: generated image -->
+      <div class="pin-result-image-wrap">
+        <img id="pin-result-img" class="pin-result-img" src="" alt="Generated pin" />
+        <button class="pin-btn-small" id="pin-regen-image-btn">🔄 New Image</button>
+      </div>
+
+      <!-- RIGHT: caption + hashtags -->
+      <div class="pin-result-text">
+        <label class="pin-label">📝 Caption</label>
+        <textarea id="pin-caption" class="pin-textarea" rows="8"></textarea>
+
+        <label class="pin-label">🏷 Hashtags</label>
+        <textarea id="pin-hashtags" class="pin-textarea" rows="3"></textarea>
+
+        <div class="pin-actions">
+          <button class="pin-btn-small" id="pin-regen-text-btn">🔄 Regenerate Caption</button>
+          <button class="pin-btn-small pin-btn-copy" id="pin-copy-btn">📋 Copy All</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ERROR -->
+  <div id="pin-error" class="pin-error" hidden></div>
+
+</div>
+<script type="module" src="/platforms/pinterest/panel.js"></script>
+</body>
+</html>
