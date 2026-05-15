@@ -1,20 +1,12 @@
 <div class="yt-panel">
     <div class="yt-card">
-        <h2>YouTube video metadata</h2>
-        <p class="yt-sub">Tell the model what your video is about and what kind of video it is. You'll get a title, description, tags, and a thumbnail prompt.</p>
+        <h2>YouTube thumbnail generator</h2>
+        <p class="yt-sub">Upload an audio or video file. We'll transcribe it, write a clickbait title, iteratively generate a matching thumbnail, and extract hashtags.</p>
 
-        <label class="yt-label" for="ytSubject">Video subject</label>
-        <textarea id="ytSubject" class="yt-input" rows="4" placeholder="e.g. How I built a SaaS in a weekend with FastAPI..."></textarea>
+        <label class="yt-label" for="ytFileInput">Audio or video file</label>
+        <input type="file" id="ytFileInput" class="yt-input" accept="audio/*,video/*">
 
-        <label class="yt-label" for="ytKind">Kind</label>
-        <select id="ytKind" class="yt-input">
-            <option value="tutorial">Tutorial</option>
-            <option value="vlog">Vlog</option>
-            <option value="review">Review</option>
-            <option value="shorts">Shorts</option>
-        </select>
-
-        <button id="ytGenerateBtn" class="yt-btn">Generate</button>
+        <button id="ytGenerateBtn" class="yt-btn" disabled>Generate</button>
         <p id="ytStatus" class="yt-status" aria-live="polite"></p>
     </div>
 
@@ -24,15 +16,18 @@
         <label class="yt-label">Title</label>
         <div id="ytTitle" class="yt-output yt-title"></div>
 
-        <label class="yt-label" style="margin-top:14px;">Description</label>
-        <div id="ytDescription" class="yt-output"></div>
+        <label class="yt-label" style="margin-top:14px;">Thumbnail</label>
+        <img id="ytThumb" class="yt-thumb-image" alt="Generated thumbnail">
 
-        <label class="yt-label" style="margin-top:14px;">Thumbnail prompt</label>
-        <div id="ytThumb" class="yt-output yt-thumb"></div>
+        <label class="yt-label" style="margin-top:14px;">Hashtags</label>
+        <div id="ytHashtags" class="yt-output yt-tags"></div>
 
-        <label class="yt-label" style="margin-top:14px;">Tags</label>
-        <div id="ytTags" class="yt-output yt-tags"></div>
+        <label class="yt-label" style="margin-top:14px;">BLIP caption (what the image shows)</label>
+        <div id="ytCaption" class="yt-output"></div>
 
-        <button id="ytCopyBtn" class="yt-btn-secondary" style="margin-top:14px;">Copy all</button>
+        <label class="yt-label" style="margin-top:14px;">Alignment scores</label>
+        <div id="ytScores" class="yt-output yt-thumb"></div>
+
+        <button id="ytCopyBtn" class="yt-btn-secondary" style="margin-top:14px;">Copy title + hashtags</button>
     </div>
 </div>
