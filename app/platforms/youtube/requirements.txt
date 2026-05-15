@@ -1,1 +1,14 @@
 pydantic
+fastapi
+uvicorn
+python-multipart
+Pillow
+openai-whisper
+transformers
+torch
+torchvision
+imageio-ffmpeg
+keybert
+pydub
+audioop-lts; python_version >= "3.13"
+sentence-transformers
