@@ -159,7 +159,6 @@ def _build_messages(transcript: str, tone_id: str) -> list:
     system_msg = (
         "You are an expert Social Media Manager and Reddit content creator. "
         f"{tone_line} "
-<<<<<<< Updated upstream
         "Convert the user's transcript into a complete Reddit post. "
         "Respond with ONLY a single JSON object, no preamble, no markdown fences, no commentary. "
         "Required keys exactly: reddit_title, reddit_body, image_prompt. "
@@ -167,15 +166,6 @@ def _build_messages(transcript: str, tone_id: str) -> list:
         "reddit_body: 2-4 paragraphs matching the tone above. "
         "image_prompt: descriptive text-to-image prompt aligned with the post. "
         "If the transcript is too short or unclear, infer a creative interpretation."
-=======
-        "Your task is to TRANSFORM the user's spoken transcript into a high-quality, engaging Reddit post. "
-        "DO NOT just repeat the transcript. Synthesize the key points into a compelling title and body. "
-        "Respond with ONLY a single JSON object. No markdown, no preamble. "
-        "Required keys: reddit_title, reddit_body, image_prompt. "
-        "reddit_title: A short, attention-grabbing title (max 300 chars). "
-        "reddit_body: 2-4 paragraphs of engaging content matching the tone. "
-        "image_prompt: A highly detailed, artistic text-to-image prompt that visually represents the core concept of the post."
->>>>>>> Stashed changes
     )
     user_msg = f"TRANSCRIPT TO TRANSFORM:\n{transcript}\n\nReturn the JSON object now:"
     return [
